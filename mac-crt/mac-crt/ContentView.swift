@@ -7,16 +7,21 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @State private var displayFilter = false
+struct ContentView : View {
+    var dismiss: () -> ()
     
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("Mac-CRT")
-                .font(.headline)
-                
-            Toggle("Enable Filter", isOn: $displayFilter)
-                .toggleStyle(.switch)
+    var body : some View {
+        VStack {
+            Button {
+                self.dismiss()
+            } label: {
+                Image(systemName: "xmark")
+            }
+            Image(systemName: "water.waves")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello world!")
         }
+        .padding()
     }
 }

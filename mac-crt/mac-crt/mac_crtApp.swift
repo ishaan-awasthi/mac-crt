@@ -14,7 +14,7 @@ struct mac_crtApp: App {
             "Menu Bar Example",
             systemImage: "water.waves"
         ) {
-            ContentView()
+            MenuBarApp()
 //                .overlay(alignment: .topTrailing) {
 //                    Button(
 //                        "Quit",
