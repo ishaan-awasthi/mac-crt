@@ -10,8 +10,12 @@ import SwiftUI
 @main
 struct mac_crtApp: App {
     var body: some Scene {
-        WindowGroup {
+        MenuBarExtra(
+            "Menu Bar Example",
+            systemImage: "water.waves"
+        ) {
             ContentView()
-        }
+                .frame(width: 150, height: 75)
+        }.menuBarExtraStyle(.window)
     }
 }

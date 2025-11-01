@@ -8,17 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var displayFilter = false
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        VStack(alignment: .leading) {
+            Text("Mac-CRT")
+                .font(.headline)
+                
+            Toggle("Enable Filter", isOn: $displayFilter)
+                .toggleStyle(.switch)
         }
-        .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }
