@@ -10,21 +10,43 @@ import AppKit
 
 class OverlayWindowManager: ObservableObject {
     static let shared = OverlayWindowManager()
-    private var panels: [ContentPanel] = []
+    private var panel: ContentPanel?
+    private var eventMonitor: Any?
+    @Published var isShowing: Bool = false
     
     func show() {
-        // Create panels for all screens
-        for screen in NSScreen.screens {
-            let panel = ContentPanel(screen: screen)
-            panel.makeKeyAndOrderFront(nil)
-            panels.append(panel)
-        }
+        guard let mainScreen = NSScreen.main else { return }
+        
+        let newPanel = ContentPanel(screen: mainScreen)
+        newPanel.orderFront(nil)
+        NSCursor.hide()
+        panel = newPanel
+        isShowing = true
+        
+        startKeyMonitoring()
     }
 
     func hide() {
-        for panel in panels {
-            panel.orderOut(nil)
+        panel?.orderOut(nil)
+        panel = nil
+        NSCursor.unhide()
+        isShowing = false
+        
+        stopKeyMonitoring()
+    }
+    
+    private func startKeyMonitoring() {
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            if event.keyCode == 53 { // Escape key
+                self?.hide()
+            }
         }
-        panels.removeAll()
+    }
+    
+    private func stopKeyMonitoring() {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
+        }
     }
 }

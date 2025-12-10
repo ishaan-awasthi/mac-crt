@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GridOverlay: Shape {
-    let lineSpacing: CGFloat // Distance between lines
+    let lineSpacing: CGFloat
     
     func path(in rect: CGRect) -> Path {
         var path = Path()

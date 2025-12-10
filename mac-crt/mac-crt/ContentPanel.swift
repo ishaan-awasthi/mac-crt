@@ -1,31 +1,30 @@
 //
-//  OverlayFilter.swift
+//  ContentPanel.swift
 //  mac-crt
 //
 //  Created by ishaan on 10/31/25.
 //
-
 
 import AppKit
 import SwiftUI
 
 class ContentPanel: NSPanel {
     
-    init(screen: NSScreen? = nil) {
+    init(screen: NSScreen) {
         super.init(
-            contentRect: .zero,
+            contentRect: screen.frame,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
-            defer: true
+            defer: false
         )
         
-        setupWindow()
-        setupContentView(screen: screen ?? NSScreen.main)
+        setupWindow(for: screen)
+        setupContentView()
     }
     
-    private func setupWindow() {
-        backgroundColor = .clear
-        isOpaque = false
+    private func setupWindow(for screen: NSScreen) {
+        backgroundColor = .black
+        isOpaque = true
         hasShadow = false
         level = .screenSaver
         isMovableByWindowBackground = false
@@ -35,19 +34,21 @@ class ContentPanel: NSPanel {
         
         collectionBehavior = [
             .canJoinAllSpaces,
-            .stationary
+            .stationary,
+            .fullScreenAuxiliary
         ]
+        
+        self.setFrame(screen.frame, display: true)
+        self.setFrameOrigin(screen.frame.origin)
     }
     
-    private func setupContentView(screen: NSScreen?) {
+    private func setupContentView() {
         let contentView = OverlayFilterView()
-        let hostingView = NSHostingView(rootView: contentView)
-        self.contentView = hostingView
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea(.all)
         
-        // Make it cover the specified screen
-        if let screen = screen {
-            self.setFrame(screen.frame, display: true)
-        }
+        let hostingView = NSHostingView(rootView: contentView)
+        hostingView.autoresizingMask = [.width, .height]
+        self.contentView = hostingView
     }
 }
-    

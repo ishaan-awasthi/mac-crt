@@ -10,9 +10,22 @@
 		4C2AE95D2EB49902005B64E0 /* mac-crt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mac-crt.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4C9BD5422EE93A8E006076D8 /* Exceptions for "mac-crt" folder in "mac-crt" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4C2AE95C2EB49902005B64E0 /* mac-crt */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4C2AE95F2EB49902005B64E0 /* mac-crt */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4C9BD5422EE93A8E006076D8 /* Exceptions for "mac-crt" folder in "mac-crt" target */,
+			);
 			path = "mac-crt";
 			sourceTree = "<group>";
 		};
@@ -253,8 +266,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mac-crt/Preview Content\"";
+				DEVELOPMENT_TEAM = QM7W393K7A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "mac-crt/Info.plist";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -279,8 +294,10 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"mac-crt/Preview Content\"";
+				DEVELOPMENT_TEAM = QM7W393K7A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "mac-crt/Info.plist";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
