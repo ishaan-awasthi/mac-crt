@@ -11,7 +11,7 @@ import SwiftUI
 
 class ContentPanel: NSPanel {
     
-    init() {
+    init(screen: NSScreen? = nil) {
         super.init(
             contentRect: .zero,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -20,14 +20,14 @@ class ContentPanel: NSPanel {
         )
         
         setupWindow()
-        setupContentView()
+        setupContentView(screen: screen ?? NSScreen.main)
     }
     
     private func setupWindow() {
         backgroundColor = .clear
         isOpaque = false
         hasShadow = false
-        level = .floating
+        level = .screenSaver
         isMovableByWindowBackground = false
         titlebarAppearsTransparent = true
         titleVisibility = .hidden
@@ -39,13 +39,13 @@ class ContentPanel: NSPanel {
         ]
     }
     
-    private func setupContentView() {
+    private func setupContentView(screen: NSScreen?) {
         let contentView = OverlayFilterView()
         let hostingView = NSHostingView(rootView: contentView)
         self.contentView = hostingView
         
-        // Make it cover the entire screen
-        if let screen = NSScreen.main {
+        // Make it cover the specified screen
+        if let screen = screen {
             self.setFrame(screen.frame, display: true)
         }
     }

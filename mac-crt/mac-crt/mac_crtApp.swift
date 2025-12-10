@@ -26,7 +26,6 @@ struct mac_crtApp: App {
 //                    .buttonStyle(.plain)
 //                    .padding(-2)
 //                }
-                .frame(width: 150, height: 75)
         }.menuBarExtraStyle(.window)
     }
 }

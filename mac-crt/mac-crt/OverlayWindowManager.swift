@@ -6,19 +6,25 @@
 //
 
 import SwiftUI
+import AppKit
 
 class OverlayWindowManager: ObservableObject {
     static let shared = OverlayWindowManager()
-    private var panel: ContentPanel?
+    private var panels: [ContentPanel] = []
     
     func show() {
-        if panel == nil {
-            panel = ContentPanel()
+        // Create panels for all screens
+        for screen in NSScreen.screens {
+            let panel = ContentPanel(screen: screen)
+            panel.makeKeyAndOrderFront(nil)
+            panels.append(panel)
         }
-        panel?.makeKeyAndOrderFront(nil)
     }
 
     func hide() {
-        panel?.orderOut(nil)
+        for panel in panels {
+            panel.orderOut(nil)
+        }
+        panels.removeAll()
     }
 }
