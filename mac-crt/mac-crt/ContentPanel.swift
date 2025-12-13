@@ -35,11 +35,46 @@ class ContentPanel: NSPanel {
         collectionBehavior = [
             .canJoinAllSpaces,
             .stationary,
-            .fullScreenAuxiliary
+            .fullScreenAuxiliary,
+            .ignoresCycle
         ]
         
         self.setFrame(screen.frame, display: true)
         self.setFrameOrigin(screen.frame.origin)
+        
+        // Monitor space changes to ensure window stays visible
+        setupSpaceMonitoring()
+    }
+    
+    private func setupSpaceMonitoring() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(spaceDidChange),
+            name: NSWorkspace.activeSpaceDidChangeNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func spaceDidChange() {
+        // Re-show window after space change to ensure it stays visible
+        DispatchQueue.main.async { [weak self] in
+            self?.orderFront(nil)
+            self?.level = .screenSaver
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // Allow keyboard events to pass through so monitors can catch them
+    override var acceptsFirstResponder: Bool {
+        return false
+    }
+    
+    override func keyDown(with event: NSEvent) {
+        // Don't handle key events, let them pass through to monitors
+        super.keyDown(with: event)
     }
     
     private func setupContentView() {

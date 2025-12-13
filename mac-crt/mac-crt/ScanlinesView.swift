@@ -8,18 +8,19 @@
 import SwiftUI
 
 struct ScanlinesView: View {
+    @ObservedObject private var settings = CRTSettings.shared
     @State private var offset: CGFloat = 0
-    let lineSpacing: CGFloat = 6
-    let lineHeight: CGFloat = 2
     
     var body: some View {
         GeometryReader { geometry in
             Canvas { context, size in
                 var y: CGFloat = offset
+                let lineSpacing = settings.scanlineSpacing
+                let lineHeight = settings.scanlineHeight
                 
                 while y < size.height + lineSpacing {
                     let rect = CGRect(x: 0, y: y, width: size.width, height: lineHeight)
-                    context.fill(Path(rect), with: .color(.black.opacity(0.3)))
+                    context.fill(Path(rect), with: .color(.black.opacity(settings.scanlineOpacity)))
                     y += lineSpacing
                 }
             }
@@ -27,7 +28,12 @@ struct ScanlinesView: View {
         .ignoresSafeArea()
         .onAppear {
             withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-                offset = lineSpacing
+                offset = settings.scanlineSpacing
+            }
+        }
+        .onChange(of: settings.scanlineSpacing) { _, newValue in
+            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                offset = newValue
             }
         }
     }

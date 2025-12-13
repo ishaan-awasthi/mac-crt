@@ -8,9 +8,11 @@
 import SwiftUI
 import CoreImage
 import CoreImage.CIFilterBuiltins
+import Combine
 
 struct CaptureOverlayView: View {
     @StateObject private var captureManager = ScreenCaptureManager()
+    @ObservedObject private var settings = CRTSettings.shared
     @State private var windowID: CGWindowID?
     
     var body: some View {
@@ -22,13 +24,13 @@ struct CaptureOverlayView: View {
             
             // Color tint
             Color(red: 1.0, green: 0.6, blue: 0.0)
-                .opacity(0.15)
+                .opacity(settings.tintOpacity)
             
             // Vignette
             RadialGradient(
                 gradient: Gradient(colors: [
                     .clear,
-                    .black.opacity(0.3)
+                    .black.opacity(settings.vignetteOpacity)
                 ]),
                 center: .center,
                 startRadius: 200,
@@ -36,8 +38,8 @@ struct CaptureOverlayView: View {
             )
             
             // Grid lines
-            GridOverlay(lineSpacing: 3)
-                .stroke(Color.black.opacity(0.2), lineWidth: 0.5)
+            GridOverlay(lineSpacing: settings.gridSpacing)
+                .stroke(Color.black.opacity(settings.gridOpacity), lineWidth: 0.5)
             
             // Animated scanlines
             ScanlinesView()
@@ -76,25 +78,37 @@ struct WindowAccessor: NSViewRepresentable {
 
 struct CaptureEffectsView: NSViewRepresentable {
     let frame: CIImage
+    @ObservedObject var settings = CRTSettings.shared
     
     func makeNSView(context: Context) -> EffectsView {
-        return EffectsView()
+        return EffectsView(settings: settings)
     }
     
     func updateNSView(_ nsView: EffectsView, context: Context) {
         nsView.updateFrame(frame)
+        nsView.updateSettings(settings)
     }
 }
 
 class EffectsView: NSView {
     private let ciContext = CIContext()
     private var currentFrame: CIImage?
+    private var settings: CRTSettings
+    private var cancellables = Set<AnyCancellable>()
     
-    override init(frame frameRect: NSRect) {
-        super.init(frame: frameRect)
+    init(settings: CRTSettings) {
+        self.settings = settings
+        super.init(frame: .zero)
         wantsLayer = true
         self.canDrawConcurrently = true
         self.layerContentsRedrawPolicy = .duringViewResize
+        
+        // Observe settings changes
+        settings.objectWillChange.sink { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.needsDisplay = true
+            }
+        }.store(in: &cancellables)
     }
     
     required init?(coder: NSCoder) {
@@ -106,6 +120,11 @@ class EffectsView: NSView {
         needsDisplay = true
     }
     
+    func updateSettings(_ newSettings: CRTSettings) {
+        settings = newSettings
+        needsDisplay = true
+    }
+    
     override func draw(_ dirtyRect: NSRect) {
         guard let context = NSGraphicsContext.current?.cgContext,
               let frame = currentFrame else { return }
@@ -113,8 +132,8 @@ class EffectsView: NSView {
         // Apply bloom filter
         let bloom = CIFilter.bloom()
         bloom.inputImage = frame
-        bloom.radius = 10
-        bloom.intensity = 0.5
+        bloom.radius = Float(settings.bloomRadius)
+        bloom.intensity = Float(settings.bloomIntensity)
         
         guard var outputImage = bloom.outputImage else { return }
         
@@ -126,7 +145,7 @@ class EffectsView: NSView {
             bulgeFilter.setValue(outputImage, forKey: kCIInputImageKey)
             bulgeFilter.setValue(center, forKey: kCIInputCenterKey)
             bulgeFilter.setValue(radius, forKey: kCIInputRadiusKey)
-            bulgeFilter.setValue(0.23, forKey: kCIInputScaleKey) // CHANGE THIS
+            bulgeFilter.setValue(settings.distortionScale, forKey: kCIInputScaleKey)
             
             if let bulged = bulgeFilter.outputImage {
                 outputImage = bulged
@@ -134,7 +153,7 @@ class EffectsView: NSView {
         }
         
         // Scale up to fill screen after distortion
-        let scaleTransform = CGAffineTransform(scaleX: 0.93, y: 0.85) // CHANGE THESE
+        let scaleTransform = CGAffineTransform(scaleX: settings.scaleX, y: settings.scaleY)
         let centerX = bounds.width / 2
         let centerY = bounds.height / 2
         
